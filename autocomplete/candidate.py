@@ -6,7 +6,7 @@ class Candidate:
     """
 
     def __init__(self, word=None, confidence=None):
-        """Initalizes candidate object.
+        """Initalizes Candidate object.
 
         :param str word: Autocomplete candidate word.
         :param int confidence: Confidence of candidate word.
