@@ -1,6 +1,8 @@
-"""Contains the AutocompleteProvider class.
+"""Contains the AutocompleteProvider class and helper functions.
 """
 
+import string
+from autocomplete import candidate as cand
 
 class AutocompleteProvider:
     """Provides autocomplete suggestions for word fragments. Suggestions are
@@ -26,3 +28,12 @@ class AutocompleteProvider:
         use to train.
         """
         pass
+
+
+def preprocess(passage):
+    """Preprocesses a passage for training in the AutocompleteProvider class. 
+    Returns a list of lowercase words without punctuation.
+
+    :param str passage: The passage of words to be preprocessed.
+    """
+    return passage.translate(None, string.punctuation).lower().split()

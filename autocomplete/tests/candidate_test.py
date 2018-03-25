@@ -110,6 +110,5 @@ class TestCandidateWordAndConfidence(unittest.TestCase):
         self.assertEqual(output, correct_answer)
 
 
-
 if __name__ == '__main__':
     unittest.main()
