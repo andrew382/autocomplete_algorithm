@@ -89,10 +89,56 @@ class TestMemorize(unittest.TestCase):
         self.assertEqual(output, correct_answer)
 
 
-class TestMemorize(unittest.TestCase):
-    """Tests the memorize function.
+class TestGetBottomNode(unittest.TestCase):
+    """Tests the get_bottom_node function.
     """
-    pass
+
+    def setUp(self):
+        self.abc_memory = {'a': auto.MemoryNode({'b':  # memory of the word abc
+                                auto.MemoryNode({'c': 
+                                auto.MemoryNode({}, 1)}, 0)}, 0)}
+
+    def test_get_bottom_node_single_char(self):
+        """Input fragement is a single character. 
+        """
+        fragment = 'a'
+        correct_answer = auto.MemoryNode({'b':  
+                                auto.MemoryNode({'c': 
+                                auto.MemoryNode({}, 1)}, 0)}, 0)
+        output = auto.get_bottom_node(fragment, self.abc_memory)
+        self.assertEqual(output, correct_answer)
+
+    def test_get_bottom_node_bottom(self):
+        """Input fragement should return a node at the bottom of memory. 
+        """
+        fragment = 'abc'
+        correct_answer = auto.MemoryNode({}, 1)
+        output = auto.get_bottom_node(fragment, self.abc_memory)
+        self.assertEqual(output, correct_answer)
+
+    def test_get_bottom_node_branches(self):
+        """Input memory has branches and function must choose correct branch. 
+        """    
+        memory = {'a': auto.MemoryNode({
+                    'b': auto.MemoryNode({'c': auto.MemoryNode({}, 1)}, 0), 
+                    'd': auto.MemoryNode({'e': auto.MemoryNode({}, 2)}, 0)}, 0)}
+        fragment = 'ade'
+        correct_answer = auto.MemoryNode({}, 2)
+        output = auto.get_bottom_node(fragment, memory)
+        self.assertEqual(output, correct_answer)
+
+    def test_get_bottom_node_key_error(self):
+        """If the fragment does not lead to a node, the function should throw a
+        KeyError.
+        """
+        fragment = 'def'
+        try:
+            output = auto.get_bottom_node(fragment, self.abc_memory)
+            passes_test = False
+        except KeyError: 
+            passes_test = True
+        self.assertTrue(passes_test)
+        
 
 class TestAutocompleteProvider(unittest.TestCase):
     """Tests the methods of the AutocompleteProvider class.

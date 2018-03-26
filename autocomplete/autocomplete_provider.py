@@ -74,9 +74,11 @@ def get_candidates(fragment, memory):
     return candidate_list
 
 
+# TODO: consider having function return Candidate({}, 0) if KeyError is thrown.
 def get_bottom_node(fragment, memory):
     """Goes down the nested dictionaries in memory in a path given by fragment.
-    Returns the MemoryNode at the end of the path.
+    Returns the MemoryNode at the end of the path. Function throws KeyError if
+    fragment is not recognized in the memory. 
 
     :param str fragment: word fragment that specifies the path.
     :param dict memory: memory dictionary that the word will be added to.
