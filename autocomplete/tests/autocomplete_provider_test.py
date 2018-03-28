@@ -2,6 +2,7 @@
 """
 
 import unittest
+from autocomplete import candidate as cand
 from autocomplete import autocomplete_provider as auto
 
 class TestPreprocess(unittest.TestCase):
@@ -140,26 +141,201 @@ class TestGetBottomNode(unittest.TestCase):
         self.assertTrue(passes_test)
         
 
-class TestAutocompleteProvider(unittest.TestCase):
-    """Tests the methods of the AutocompleteProvider class.
+class TestGetCandidates(unittest.TestCase):
+    """Tests the get_candidates function.
+    """
+
+    def test_get_candidates_none(self):
+        """No good candidates in memory.
+        """
+        memory = {'a': auto.MemoryNode({'b':
+                       auto.MemoryNode({'c': 
+                       auto.MemoryNode({}, 0)}, 0)}, 0)}
+        fragment = 'a'
+        correct_answer = []
+        output = auto.get_candidates(fragment, memory)
+        self.assertEqual(output, correct_answer)
+
+    def test_get_candidates_one_good_bottom(self):
+        """One good candidate at bottom level of memmory.
+        """
+        memory = {'a': auto.MemoryNode({'b':
+                       auto.MemoryNode({'c': 
+                       auto.MemoryNode({}, 2)}, 0)}, 0)}
+        fragment = 'prefix'
+        correct_answer = [cand.Candidate('prefixabc', 2)]
+        output = auto.get_candidates(fragment, memory)
+        self.assertEqual(output, correct_answer)
+
+    def test_get_candidates_two_good_diff_lvl(self):
+        """Two good candidates at different levels of memmory.
+        """
+        memory = {'a': auto.MemoryNode({'b':
+                       auto.MemoryNode({'c': 
+                       auto.MemoryNode({}, 1)}, 0)}, 2)}
+        fragment = 'prefix'
+        correct_answer = [cand.Candidate('prefixa', 2), 
+                          cand.Candidate('prefixabc', 1)]
+        output = auto.get_candidates(fragment, memory)
+        self.assertEqual(output, correct_answer)
+
+    def test_get_candidates_diff_branches(self):
+        """Two good candidates down different branches of memmory.
+        """
+        memory = {'a': auto.MemoryNode({'b': auto.MemoryNode({'c': 
+                                             auto.MemoryNode({}, 1)}, 0),
+                                        'd': auto.MemoryNode({'e': 
+                                             auto.MemoryNode({}, 3)}, 0)}, 0)}
+        fragment = 'prefix'
+        correct_answer = [cand.Candidate('prefixabc', 1), 
+                          cand.Candidate('prefixade', 3)]
+        output = auto.get_candidates(fragment, memory)
+        self.assertEqual(output, correct_answer)
+
+
+class TestAutocompleteProviderTrain(unittest.TestCase):
+    """Tests train method of the AutocompleteProvider class.
     """
 
     def test_train_no_memory(self):
         """Tests the train method when there are no previous memories.
         """
-        pass
+        passage = 'Abc d-ef'  # contains uppercase and special characters
+        correct_answer = {'a': auto.MemoryNode({'b':
+                               auto.MemoryNode({'c': 
+                               auto.MemoryNode({}, 1)}, 0)}, 0),
+                          'd': auto.MemoryNode({'e':
+                               auto.MemoryNode({'f': 
+                               auto.MemoryNode({}, 1)}, 0)}, 0)}
+        algorithm = auto.AutocompleteProvider()
+        algorithm.train(passage)
+        self.assertEqual(algorithm.memory, correct_answer)
+
+    def test_train_has_memory(self):
+        """Test the train method when there are previous memories.
+        """
+        passage = 'ab abc abd'
+        memory = {'a': auto.MemoryNode({'b': 
+                       auto.MemoryNode({'c': 
+                       auto.MemoryNode({}, 1)}, 0)}, 0)}
+        correct_answer = {'a': auto.MemoryNode({'b': 
+                               auto.MemoryNode({'c': auto.MemoryNode({}, 2),
+                                                'd': auto.MemoryNode({}, 1)}, 
+                                                1)}, 0)}
+        algorithm = auto.AutocompleteProvider()
+        algorithm.memory = memory
+        algorithm.train(passage)
+        self.assertEqual(algorithm.memory, correct_answer)
+
+
+class TestAutocompleteProviderGetWords(unittest.TestCase):
+    """Tests getWords method of the AutocompleteProvider class.
+    """
+
+    def test_getWords_no_candidates(self):
+        """No good candidates in memory for passed fragment.
+        """
+        memory = {'a': auto.MemoryNode({'b':
+                       auto.MemoryNode({'c': 
+                       auto.MemoryNode({}, 1)}, 0)}, 0)}
+        fragment = 'ad'
+        correct_answer = []
+        alg = auto.AutocompleteProvider()
+        alg.memory = memory
+        output = alg.getWords(fragment)
+        self.assertEqual(output, correct_answer)
+
+    def test_getWords_different_branches(self):
+        """Two good candidates in different branches. 
+        """
+        memory = {'a': auto.MemoryNode({
+                        'b': auto.MemoryNode({'c': auto.MemoryNode({}, 1)}, 0),
+                        'd': auto.MemoryNode({'e':
+                                auto.MemoryNode({'f': auto.MemoryNode({}, 2)}, 
+                        0)}, 0)}, 0),}
+        fragment = 'a'
+        correct_answer = [cand.Candidate('adef', 2), cand.Candidate('abc', 1)]
+        alg = auto.AutocompleteProvider()
+        alg.memory = memory
+        output = alg.getWords(fragment)
+        self.assertEqual(output, correct_answer)
+
+    def test_getWords_not_all_good_candidates(self):
+        """Given the fragment and memory, getWords should not return every 
+        candidate with a postive confidence in memory.
+        """
+        memory = {'a': auto.MemoryNode({'b':
+                       auto.MemoryNode({'c': 
+                       auto.MemoryNode({}, 1)}, 0)}, 1)}
+        fragment = 'aB'  # contains uppercase
+        correct_answer = [cand.Candidate('abc', 1)]
+        alg = auto.AutocompleteProvider()
+        alg.memory = memory
+        output = alg.getWords(fragment)
+        self.assertEqual(output, correct_answer)
+
+
+class TestAutocompleteProviderIntegrationTests(unittest.TestCase):
+    """Tests AutocompleteProvider methods when used together.
+    """
 
     def test_getWords_example(self):
-        """Tests getWords method on the given example.
+        """Tests AutocompleteProvider on the given example.
         """
         passage = 'The third thing that I need to tell you is that this thing \
         does not think thoroughly.'
         alg = auto.AutocompleteProvider()
         alg.train(passage)
-        candidates = alg.getWords('thi')
-        for c in candidates:
-            print c.word
-            print c.confidence
+        fragment1 = 'thi'
+        correct_answer1 = [cand.Candidate('thing', 2),
+                           cand.Candidate('this', 1),
+                           cand.Candidate('third', 1),
+                           cand.Candidate('think', 1)]
+        fragment2 = 'nee'     
+        correct_answer2 = [cand.Candidate('need', 1)]
+        fragment3 = 'th'
+        correct_answer3 = [cand.Candidate('thing', 2),
+                           cand.Candidate('that', 2),
+                           cand.Candidate('this', 1),
+                           cand.Candidate('third', 1),
+                           cand.Candidate('think', 1),
+                           cand.Candidate('the', 1),
+                           cand.Candidate('thoroughly', 1)]    
+        output1 = alg.getWords(fragment1)
+        output2 = alg.getWords(fragment2)
+        output3 = alg.getWords(fragment3)
+        self.assertEqual(output1, correct_answer1)
+        self.assertEqual(output2, correct_answer2)
+        self.assertEqual(output3, correct_answer3)
+
+    def test_getWords_train_twice(self):
+        """Tests AutocompleteProvider when trained twice.
+        """
+        passage1 = 'This is the fIrst passage.'
+        passage2 = 'here is the second passage that works. The thing pass!!!'
+        alg = auto.AutocompleteProvider()
+        alg.train(passage1)
+        alg.train(passage2)
+        fragment1 = 'i'
+        correct_answer1 = [cand.Candidate('is', 2)]
+        fragment2 = 'th'
+        correct_answer2 = [cand.Candidate('the', 3),
+                           cand.Candidate('this', 1),
+                           cand.Candidate('thing', 1),
+                           cand.Candidate('that', 1)]
+        fragment3 = 'FIRST'
+        correct_answer3 = [cand.Candidate('first', 1)]   
+        fragment4 = 'pass'                       
+        correct_answer4 = [cand.Candidate('passage', 2),
+                           cand.Candidate('pass', 1)]    
+        output1 = alg.getWords(fragment1)
+        output2 = alg.getWords(fragment2)
+        output3 = alg.getWords(fragment3)
+        output4 = alg.getWords(fragment4)
+        self.assertEqual(output1, correct_answer1)
+        self.assertEqual(output2, correct_answer2)
+        self.assertEqual(output3, correct_answer3)
+        self.assertEqual(output4, correct_answer4)
 
 
 if __name__ == '__main__':

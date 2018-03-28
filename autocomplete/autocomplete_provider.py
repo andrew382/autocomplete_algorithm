@@ -2,8 +2,6 @@
 """
 
 import string
-from functools import reduce
-from collections import namedtuple
 from autocomplete import candidate as cand
 
 class AutocompleteProvider:
@@ -64,6 +62,13 @@ class MemoryNode:
 
 
 def get_candidates(fragment, memory):
+    """Iterates through memory and returns a list of candidate words that have 
+    positive confidence. 
+
+    :param str fragment: The word prefix that procedes the letter keys in the 
+    memory dictionary.
+    :param dict memory: contains memory of words.
+    """
     candidate_list = []
     for letter, node in memory.iteritems():
         new_fragment = fragment + letter
@@ -74,7 +79,6 @@ def get_candidates(fragment, memory):
     return candidate_list
 
 
-# TODO: consider having function return Candidate({}, 0) if KeyError is thrown.
 def get_bottom_node(fragment, memory):
     """Goes down the nested dictionaries in memory in a path given by fragment.
     Returns the MemoryNode at the end of the path. Function throws KeyError if
