@@ -20,7 +20,7 @@ This autocomplete algorithm memorizes a word by storing each letter and the numb
 
 ### Programming Language
 
-Code was developed using Python 2.7.10. Thus, it is reccommeded to run code using Python 2.7. 
+Code was developed using Python 2.7.10. Thus, it is recommended to run code using Python 2.7. 
 
 ### Imports
 
@@ -31,10 +31,32 @@ from autocomplete.candidate import Candidate
 from autocomplete.autocomplete_provider import AutocompleteProvider
 ```
 
+### Running .py files
 
+It is recommended to run .py files with the Python module option using the command
+
+`python -m <file>`
+
+to ensure imports function properly.
+
+#### Running `example.py`
+
+Run the example file using the command
+
+`python -m example`
+
+in the top directory. 
 
 ## Unit Tests
 
-Information coming soon.
+Run the `AutocompleteProvider` unit tests and the `Candidate` unit test using the commands
+
+`python -m autocomplete.tests.autocomplete_provider_test`
+
+and
+
+`python -m autocomplete.tests.candidate_test`
+
+respecively, at the top directory. 
 
 
