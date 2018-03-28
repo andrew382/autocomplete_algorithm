@@ -13,10 +13,10 @@ We need you to write the algorithm that will learn the words typed by the user o
 
 ## About the Algorithm
 
-This autocomplete algorithm memorizes a word by storing each letter and the number of occurences in nested dictionaries. Each letter in the word is a dictionary key to both the next letter and occurance count of the key letter. This allows for fast word candidate generation and minimzes the memory space required.
+This autocomplete algorithm memorizes a word by storing each letter and the number of occurrences in nested dictionaries. Each letter in the word is a dictionary key to both the next letter and occurrence count of the key letter. This allows for fast word candidate generation and minimizes the memory space required.
 
 
-## How To Use
+## How to Use
 
 ### Programming Language
 
@@ -39,9 +39,9 @@ It is recommended to run .py files with the Python module option using the comma
 
 to ensure imports function properly.
 
-#### Running `example.py`
+#### Running the Example
 
-Run the example file using the command
+Examples of using the `AutocompleteProvider` class can be found in `example.py`. Run the example file using the command
 
 `python -m example`
 
@@ -57,6 +57,6 @@ and
 
 `python -m autocomplete.tests.candidate_test`
 
-respecively, at the top directory. 
+respectively, at the top directory. 
 
 
