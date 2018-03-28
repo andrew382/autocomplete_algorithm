@@ -31,6 +31,14 @@ from autocomplete.candidate import Candidate
 from autocomplete.autocomplete_provider import AutocompleteProvider
 ```
 
+### Using Candidate
+
+Initilize an instance of the `Candidate` class with `Candidate(word, confidence)` where both `word` and `confidence` are optional arguments. Get the word and confidence using the methods `Candidate.getWord()` and `Candidate.getConfidence()`, respectively. 
+
+### Using AutocompleteProvider
+
+Initilize an instance of the `AutocompleteProvider` class with `AutocompleteProvider()`. Train the algorithm using the method `AutocompleteProvider.train(passage)` where passage is string of words that the algorithm will memorize. Use the method `AutocompleteProvider.getWords(fragment)` in order to get a list of candidate words and their likelihoods in the memory.
+
 ### Running .py files
 
 It is recommended to run .py files with the Python module option using the command
