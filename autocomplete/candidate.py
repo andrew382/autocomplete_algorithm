@@ -31,3 +31,10 @@ class Candidate:
         if isinstance(self, other.__class__):
             return self.__dict__ == other.__dict__
         return False
+
+    def __str__(self):
+        return self.word + ' (' + str(self.confidence) + ')'
+
+    def __repr__(self):
+        return str(self)
+        

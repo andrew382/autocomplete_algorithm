@@ -24,15 +24,13 @@ Code was developed using Python 2.7.10. Thus, it is reccommeded to run code usin
 
 ### Imports
 
-Import the `Candidate` and `AutocompleteProvider` with
+Import the `Candidate` and `AutocompleteProvider` with:
 
-`from autocomplete import candidate as cand`
+```
+from autocomplete.candidate import Candidate
+from autocomplete.autocomplete_provider import AutocompleteProvider
+```
 
-and
-
-`from autocomplete import autocomplete_provider as auto`
-
-respectively. 
 
 
 ## Unit Tests
